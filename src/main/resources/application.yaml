@@ -1,0 +1,26 @@
+application:
+  security:
+    csrf:
+      enabled: false
+    auth:
+      mode: jwt
+    jwt:
+      expiration: 60000
+      cache-max-size: 100000
+      cache-ttl: 300000
+spring:
+  application:
+    name: digitalpassport
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://localhost:5432/digital_passport
+    username: digital_passport
+    password: digital_passport
+  liquibase:
+    change-log: db/changelog/db.changelog-root.yaml
+  jpa:
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      ddl-auto: validate

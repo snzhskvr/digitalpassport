@@ -1,0 +1,55 @@
+networks:
+  default:
+    driver: 'bridge'
+
+volumes:
+  pgadmin_data:
+  pg_data:
+  digitalpassport_config:
+
+services:
+  pgadmin4:
+    container_name: 'digitalpassport-pgadmin4'
+    image: 'dpage/pgadmin4:7.8'
+    environment:
+      - 'PGADMIN_DEFAULT_EMAIL=admin@digitalpassport.com'
+      - 'PGADMIN_DEFAULT_PASSWORD=admin'
+    ports:
+      - '5050:80'
+    volumes:
+      - 'pgadmin_data:/var/lib/pgadmin'
+    networks:
+      - 'default'
+
+  postgres:
+    container_name: 'digitalpassport-database'
+    image: 'postgres:15.3'
+    environment:
+      - 'POSTGRES_PASSWORD=digital_passport'
+      - 'POSTGRES_USER=digital_passport'
+      - 'POSTGRES_DB=digital_passport'
+    volumes:
+      - 'pg_data:/var/lib/postgresql/data'
+    ports:
+      - '5432:5432'
+
+  digitalpassport:
+    container_name: 'digitalpassport'
+    build:
+      context: '.'
+      dockerfile: 'Dockerfile'
+    depends_on:
+      - 'postgres'
+    healthcheck:
+      test: 'curl --fail --silent localhost:8080/actuator/health | grep UP || exit 1'
+      interval: '20s'
+      timeout: '5s'
+      start_period: '40s'
+      retries: '5'
+    ports:
+      - '8080:8080'
+    volumes:
+      - 'digitalpassport_config:/app/config'
+    networks:
+      - 'default'
+    restart: 'unless-stopped'

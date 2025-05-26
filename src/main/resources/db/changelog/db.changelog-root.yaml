@@ -1,0 +1,176 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1
+      author: developer
+      changes:
+        - createTable:
+            tableName: users
+            columns:
+              - column:
+                  name: username
+                  type: varchar(256)
+                  constraints:
+                    primaryKey: true
+              - column:
+                  name: password
+                  type: varchar(256)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: account_non_expired
+                  type: boolean
+                  defaultValue: true
+                  constraints:
+                    nullable: false
+              - column:
+                  name: account_non_locked
+                  type: boolean
+                  defaultValue: true
+                  constraints:
+                    nullable: false
+              - column:
+                  name: credentials_non_expired
+                  type: boolean
+                  defaultValue: true
+                  constraints:
+                    nullable: false
+              - column:
+                  name: enabled
+                  type: boolean
+                  defaultValue: true
+                  constraints:
+                    nullable: false
+        - createTable:
+            tableName: roles
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+              - column:
+                  name: name
+                  type: varchar(256)
+                  constraints:
+                    nullable: false
+                    unique: true
+        - createTable:
+            tableName: user_role
+            columns:
+              - column:
+                  name: username
+                  type: varchar(256)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: role_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+        - createTable:
+            tableName: projects
+            columns:
+              - column:
+                  name: uuid
+                  type: uuid
+                  constraints:
+                    primaryKey: true
+              - column:
+                  name: name
+                  type: varchar(256)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: status
+                  type: varchar(64)
+                  constraints:
+                    nullable: false
+        - createTable:
+            tableName: documents
+            columns:
+              - column:
+                  name: uuid
+                  type: uuid
+                  constraints:
+                    primaryKey: true
+              - column:
+                  name: project_uuid
+                  type: uuid
+                  constraints:
+                    nullable: false
+              - column:
+                  name: status
+                  type: varchar(64)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: file_name
+                  type: varchar(256)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: provider
+                  type: varchar(256)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: path
+                  type: text
+                  constraints:
+                    nullable: false
+        - addForeignKeyConstraint:
+            baseTableName: documents
+            baseColumnNames: project_uuid
+            referencedTableName: projects
+            referencedColumnNames: uuid
+            constraintName: documents_project_uuid_fk
+        - addForeignKeyConstraint:
+            baseTableName: user_role
+            baseColumnNames: username
+            referencedTableName: users
+            referencedColumnNames: username
+            constraintName: user_role_username_fk
+        - addForeignKeyConstraint:
+            baseTableName: user_role
+            baseColumnNames: role_id
+            referencedTableName: roles
+            referencedColumnNames: id
+            constraintName: fk_user_role_role
+        - createIndex:
+            tableName: user_role
+            columns:
+              - column:
+                  name: username
+        - createIndex:
+            tableName: user_role
+            columns:
+              - column:
+                  name: role_id
+        - createIndex:
+            tableName: documents
+            columns:
+              - column:
+                  name: project_uuid
+  - changeSet:
+      id: 2
+      author: developer
+      changes:
+        - insert:
+            tableName: roles
+            columns:
+              - column:
+                  name: name
+                  value: 'ROLE_ADMIN'
+        - insert:
+            tableName: roles
+            columns:
+              - column:
+                  name: name
+                  value: 'ROLE_EDITOR'
+        - insert:
+            tableName: roles
+            columns:
+              - column:
+                  name: name
+                  value: 'ROLE_READER'
